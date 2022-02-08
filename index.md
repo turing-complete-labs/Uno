@@ -46,9 +46,9 @@ Batteries degrade quickly if they are left to uncharge completely. If the remote
 
 I tested UNO extensively but in case of bugs is possible to get a FW upgrade to address it. The procedure will be handled through a webpage and a supported browser (Chrome on PC or Mac).
 
-### Appendix
+## Appendix
 
-## Table 1 - Vibrations
+### Table 1 - Vibrations
 
 Single short vibration after turning on: the remote is working.
 Single short vibration: keypress
@@ -60,7 +60,7 @@ Two second long vibration: the hands on the watch are now set.
 Two short, pause, two short: the time entered is invalid (eg. 3:81)
 Four quick vibrations: the device is turning off in sleep mode.
 
-## Table 2 - LED color blink battery code (after pressing the R button)
+### Table 2 - LED color blink battery code (after pressing the R button)
 
 One long green flash (battery fully charged)
 Two green flashes (battery charged)
