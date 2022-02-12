@@ -8,7 +8,7 @@ Green blinking means that the remote has never been paired with a watch and it's
 Once a suitable device is found, the LED will turn yellow to indicate pairing. This might be so quick to be unnoticeable. Once the remote is ready, the LED will turn off and a one second vibration indicate that the pairing was successful.
 Should the watch go out of range from the remote, the remote will start emitting a "heart-beat" vibration until the watch is back in range. A successful reconnection will be prompted by the one second vibration.
 
-NOTE: disconnect/reconnect events are all signaled through vibrations, the LED will never turn on until the remote is restarted.
+NOTE: disconnect/reconnect events are all signaled through vibrations, the LED will never turn on until the remote is restarted or battery is critical.
 
 ## Standard remote turn-on steps
 
@@ -50,20 +50,20 @@ I tested UNO extensively but in case of bugs is possible to get a FW upgrade to 
 
 ### Table 1 - Vibrations
 
-Single short vibration after turning on: the remote is working.
-Single short vibration: keypress
-Single long vibration: long keypress, it depends on the key. See above.
-Heartbeat vibration continuous (every 4 secs): the paired device is out of range.
-Single long vibration after heartbeat: the device successfully reconnected.
-Three consecutive short vibrations: factory reset completed.
-Two second long vibration: the hands on the watch are now set.
-Two short, pause, two short: the time entered is invalid (eg. 3:81)
-Four quick vibrations: the device is turning off in sleep mode.
+* Single short vibration after turning on: the remote is working.
+* Single short vibration: keypress
+* Single long vibration: long keypress, it depends on the key. See above.
+* Heartbeat vibration continuous (every 4 secs): the paired device is out of range.
+* Single long vibration after heartbeat: the device successfully reconnected.
+* Three consecutive short vibrations: factory reset completed.
+* Two second long vibration: the hands on the watch are now set.
+* Two short, pause, two short: the time entered is invalid (eg. 3:81)
+* Four quick vibrations: the device is turning off in sleep mode.
 
 ### Table 2 - LED color blink battery code (after pressing the R button)
 
-One long green flash (battery fully charged)
-Two green flashes (battery charged)
-One green flash (battery ok)
-One yellow flash (battery low)
-One long red flash (battery approaching to critical, please get ready to recharge)
+* One long green flash (battery fully charged)
+* Two green flashes (battery charged)
+* One green flash (battery ok)
+* One yellow flash (battery low)
+* One long red flash (battery approaching to critical, please get ready to recharge)
