@@ -21,7 +21,7 @@
           <img src="{{site.logo | relative_url}}" alt="Logo" />
         {% endif %}
 
-        <h1><center>{{ site.description | default: site.github.project_tagline }}</center?</h1>
+        <h1><center><a href="{{ "/" | absolute_url }}">{{ site.description | default: site.github.project_tagline }}</a></center?</h1>
       </header>
       <section>
 
