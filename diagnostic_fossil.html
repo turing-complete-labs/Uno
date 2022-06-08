@@ -1,0 +1,93 @@
+    <script>
+        const WATCH_SERVICE = "3dda0001-957f-7d4a-34a6-74696673696d";
+        const WATCH_CHAR = "3dda0002-957f-7d4a-34a6-74696673696d";
+        const characteristicSize = 512;
+
+        var currentDevice = null;
+        var connected = false;
+        let watchService = null;
+        let watchCharacteristic = null;
+        let readyFlagCharacteristic = null;
+        let dataToSend = null;
+        let updateData = null;
+
+        var totalSize;
+        var remaining;
+        var amountToWrite;
+        var currentPosition;
+        var notification_pending = 0;
+        function catchAdvertisement(device) {
+            const abortController = new AbortController();
+            device.addEventListener('advertisementreceived', (event) => {
+                console.log('Received advertisement from "' + device.name + '"...');
+                abortController.abort();
+            }, { once: true });
+        }
+
+        function addLog(logTXT) {
+            var time = new Date().toLocaleTimeString("de-DE");
+            var logString = time + ": " + logTXT;
+            document.getElementById("log").innerHTML += logString + "<br>";
+        }
+
+        function handleError(error) {
+            addLog(error);
+        }
+
+
+
+        async function doConnect(onConnect) {
+            currentDevice.gatt.connect().then(
+                gattServer => {
+                    addCLog('Connected');
+                    gattServer.getPrimaryService(WATCH_SERVICE).
+                        then(service => {
+                            watchService = service;
+                            addLog('Service found');
+                            watchService.getCharacteristic(WATCH_CHAR).then(x => {
+                                watchCharacteristic = x;
+                                addLog('Characteristic found');
+                                onConnect();
+                            }
+                            )
+                        })
+                })
+                .catch(e => addLog(e));
+
+        }
+
+        function onDisconnected() {
+            addLog('Disconnected.');
+        }
+
+        async function completeConnect() {
+            addLog('connected');
+        }
+
+        async function connect() {
+            var deviceOptions = {
+                optionalServices: [WATCH_SERVICE],
+                acceptAllDevices: false
+            };
+
+            deviceOptions.acceptAllDevices = true;
+            deviceOptions.filters = [{ namePrefix: "Foss" }]
+
+            if (currentDevice != null) currentDevice.gatt.disconnect();
+            addLog("Searching for devices");
+            navigator.bluetooth.requestDevice(deviceOptions).then(device => {
+                currentDevice = device;
+                catchAdvertisement(device);
+                currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
+                addLog("Connecting to: " + currentDevice.name);
+                doConnect(completeConnect);
+            }).catch(handleError);
+        }
+    </script>
+
+        <p><b>Instructions</b></p>
+    <p>Make sure to disconnect the watch from other devices first (phones, tablet, etc.).</p>
+    <p>Click the button below (Connect) and allow the browser to search for bluetooth devices.</p>
+    <p>A list of devices should appear, pick the one named "Fossil" or similar, copy the text under the LOG:</p>
+    <button type="button" onclick="connect();">Connect</button><br />
+    <div id="log">Log:<br></div>
