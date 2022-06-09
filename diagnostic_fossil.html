@@ -66,11 +66,8 @@
 
         async function connect() {
             var deviceOptions = {
-                optionalServices: [WATCH_SERVICE],
-                acceptAllDevices: false
+                acceptAllDevices: true
             };
-
-            deviceOptions.filters = [{ namePrefix: "Foss" }]
 
             if (currentDevice != null) currentDevice.gatt.disconnect();
             addLog("Searching for devices");
