@@ -34,12 +34,10 @@
             addLog(error);
         }
 
-
-
         async function doConnect(onConnect) {
             currentDevice.gatt.connect().then(
                 gattServer => {
-                    addCLog('Connected');
+                    addLog('Connected');
                     gattServer.getPrimaryService(WATCH_SERVICE).
                         then(service => {
                             watchService = service;
