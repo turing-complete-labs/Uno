@@ -1,0 +1,180 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firmware update</title>
+</head>
+
+<body>
+    <script>
+        const DFU_SERVICE = "edecc3a0-2bc2-4161-b362-8002dfa8ece7";
+        const FILE_OTA_CHAR = "edecc3a1-2bc2-4161-b362-8002dfa8ece7";
+        const characteristicSize = 512;
+
+        var currentDevice = null;
+        var connected = false;
+        let esp32Device = null;
+        let esp32Service = null;
+        let readyFlagCharacteristic = null;
+        let dataToSend = null;
+        let updateData = null;
+
+        var totalSize;
+        var remaining;
+        var amountToWrite;
+        var currentPosition;
+        var notification_pending = 0;
+        window.onload = function () {
+            document.querySelector("#file").addEventListener("change", function () {
+                updateData = new FileReader();
+                if (this.files[0] != null) {
+                    // enable send.
+                    updateData.readAsArrayBuffer(this.files[0]);
+                    document.getElementById("send").disabled = false;
+                    addLog("Ready to send!");
+                }
+                else {
+                    // disable send.
+                    document.getElementById("send").disabled = true;
+                    addLog("No file selected");
+                }
+            }, false);
+        }
+        function catchAdvertisement(device) {
+            const abortController = new AbortController();
+            device.addEventListener('advertisementreceived', (event) => {
+                console.log('Received advertisement from "' + device.name + '"...');
+                abortController.abort();
+            }, { once: true });
+        }
+
+        function addLog(logTXT) {
+            var time = new Date().toLocaleTimeString("de-DE");
+            var logString = time + ": " + logTXT;
+            document.getElementById("log").innerHTML += logString + "<br>";
+        }
+
+        function SendFileOverBluetooth() {
+            if (!esp32Service) {
+                console.log("No esp32 Service");
+                return;
+            }
+
+            totalSize = updateData.result.byteLength;
+            remaining = totalSize;
+            amountToWrite = 0;
+            currentPosition = 0;
+            esp32Service.getCharacteristic(FILE_OTA_CHAR)
+                .then(characteristic => {
+                    readyFlagCharacteristic = characteristic;
+                    return characteristic.startNotifications()
+                        .then(_ => {
+                            readyFlagCharacteristic.addEventListener('characteristicvaluechanged', SendBufferedData)
+                        });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            SendBufferedData();
+        }
+
+        function SendBufferedData() {
+            if (remaining > 0) {
+                if (remaining >= characteristicSize) {
+                    amountToWrite = characteristicSize
+                }
+                else {
+                    amountToWrite = remaining;
+                }
+                dataToSend = updateData.result.slice(currentPosition, currentPosition + amountToWrite);
+                currentPosition += amountToWrite;
+                remaining -= amountToWrite;
+                addClog("remaining: " + remaining);
+                esp32Service.getCharacteristic(FILE_OTA_CHAR)
+                    .then(characteristic => RecursiveSend(characteristic, dataToSend))
+                    .then(_ => {
+                        return document.getElementById('completion').innerHTML = (100 * (currentPosition / totalSize)).toPrecision(3) + '%';
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }
+        }
+
+        function RecursiveSend(characteristic, data) {
+            return characteristic.writeValue(data)
+                .catch(error => {
+                    return RecursiveSend(characteristic, data);
+                });
+        }
+
+        function handleError(error) {
+            addLog(error);
+        }
+
+        function addClog(logTXT) {
+            console.log(logTXT);
+        }
+
+        async function doConnect(onConnect) {
+            currentDevice.gatt.connect().then(
+                gattServer => {
+                    addLog('Connected');
+                    gattServer.getPrimaryService(DFU_SERVICE).
+                        then(service => {
+                            esp32Service = service;
+                            addLog('Service found');
+                            esp32Service.getCharacteristic(FILE_OTA_CHAR).then(x => {
+                                addLog('Char found');
+                                onConnect();
+                            }
+                            )
+                        })
+                })
+                .catch(e => addLog(e));
+
+        }
+
+        function onDisconnected() {
+            addLog('Disconnected.');
+            connected = false;
+            document.getElementById("send").disabled = true;
+            document.getElementById("file").disabled = true;
+        }
+
+        async function completeConnect() {
+            addLog('connected');
+            connected = true;
+            document.getElementById("file").disabled = false;
+        }
+
+        async function connect() {
+            var deviceOptions = {
+                optionalServices: [DFU_SERVICE],
+                acceptAllDevices: false
+            };
+
+            deviceOptions.acceptAllDevices = true;
+            //deviceOptions.filters = [{ namePrefix: "U" }]
+
+            if (currentDevice != null) currentDevice.gatt.disconnect();
+            addLog("Searching for devices");
+            navigator.bluetooth.requestDevice(deviceOptions).then(device => {
+                currentDevice = device;
+                catchAdvertisement(device);
+                currentDevice.addEventListener('gattserverdisconnected', onDisconnected);
+                addLog("Connecting to: " + currentDevice.name);
+                doConnect(completeConnect);
+            }).catch(handleError);
+        }
+    </script>
+    <button type="button" onclick="connect();">Connect</button><br />
+    Select Firmware: <input id="file" type="file" accept=".bin" id="file" disabled />
+    <button type="button" id="send" onclick="SendFileOverBluetooth();" disabled>Send</button><br />
+    <p id="completion"></p>
+    <div id="log">Log:<br></div>
+
+</body>
+
+</html>
