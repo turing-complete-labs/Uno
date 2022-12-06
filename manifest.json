@@ -1,5 +1,6 @@
    {
       "type":"demo-latest-http",
       "version":"1.0.3",
-      "url":"firmware.bin"
+      "url":"http://turingcompletelabs.com/firmware.bin",
+      "spiff":"http://turingcompletelabs.com/spiff.bin"
    }
