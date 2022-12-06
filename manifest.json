@@ -2,5 +2,5 @@
       "type":"demo-latest-http",
       "version":"1.0.3",
       "url":"http://turingcompletelabs.com/firmware.bin",
-      "spiff":"http://turingcompletelabs.com/spiff.bin"
+      "spiffs":"http://turingcompletelabs.com/spiff.bin.gz"
    }
