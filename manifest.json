@@ -1,5 +1,6 @@
    {
       "type":"demo-latest-http",
       "version":"1.0.3",
+      "url":"https://turingcompletelabs.com/404.bin"
       "spiffs":"https://turingcompletelabs.com/spiffs.bin.gz"
    }
