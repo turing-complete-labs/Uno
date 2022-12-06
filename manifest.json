@@ -1,6 +1,6 @@
    {
       "type":"demo-latest-http",
       "version":"1.0.3",
-      "url":"http://turingcompletelabs.com/firmware.bin.gz",
-      "spiffs":"http://turingcompletelabs.com/spiff.bin.gz"
+      "url":"https://turingcompletelabs.com/firmware.bin.gz",
+      "spiffs":"https://turingcompletelabs.com/spiff.bin.gz"
    }
